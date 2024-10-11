@@ -7,9 +7,9 @@ on:
         - '!scripts/**'
 
 env:
-  RESOURCE_GROUP_DEV: BCSAI2024-DEVOPS-PROFESSORS
+  RESOURCE_GROUP_DEV: BCSAI2024-DEVOPS-STUDENTS-B-DEV
   SUBSCRIPTION_ID_DEV: e0b9cada-61bc-4b5a-bd7a-52c606726b3b
-  USER_ALIAS: jseijas
+  USER_ALIAS: didi
 
 jobs:
   build:
@@ -42,7 +42,7 @@ jobs:
 
       # Deploy Bicep file
     - name: deploy
-      uses: azure/arm-deploy@v1
+      uses: azure/arm-deploy@v2
       with:
         subscriptionId: ${{ env.SUBSCRIPTION_ID_DEV }}
         resourceGroupName: ${{ env.RESOURCE_GROUP_DEV }}
