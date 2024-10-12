@@ -8,7 +8,7 @@ on:
 
 env:
   RESOURCE_GROUP_DEV: BCSAI2024-DEVOPS-STUDENTS-B-DEV
-  RESOURCE_GROUP_UAT: BCSAI2024-DEVOPS-STUDENTS-B-UAT  # Added UAT resource group
+  RESOURCE_GROUP_UAT: BCSAI2024-DEVOPS-STUDENTS-B-UAT
   SUBSCRIPTION_ID_DEV: e0b9cada-61bc-4b5a-bd7a-52c606726b3b
   USER_ALIAS: didi
 
@@ -18,14 +18,20 @@ jobs:
     steps:
 
       # Checkout code
-    - uses: actions/checkout@main
+    - uses: actions/checkout@v3
 
       # Lint Bicep code 
     - name: Run Bicep linter
       run: az bicep build --file ./main.bicep
 
+      # Upload Bicep build artifact
+    - name: Upload Bicep build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: bicep-build
+        path: ./main.bicep
+
   deploy-dev:
-#   if: github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     needs: build
     environment:
@@ -34,7 +40,7 @@ jobs:
     steps:
 
       # Checkout code
-    - uses: actions/checkout@main
+    - uses: actions/checkout@v3
     
       # Log into Azure
     - uses: azure/login@v2
@@ -59,7 +65,7 @@ jobs:
       name: 'UAT'
 
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@v3
       - name: Download Bicep build artifact
         uses: actions/download-artifact@v4
         with:
@@ -72,7 +78,7 @@ jobs:
       - name: Deploy to uat
         uses: azure/arm-deploy@v2
         with:
-          subscriptionId: ${{ env.SUBSCRIPTION_ID }}
+          subscriptionId: ${{ env.SUBSCRIPTION_ID_DEV }}
           resourceGroupName: ${{ env.RESOURCE_GROUP_UAT }}
           template: ./main.bicep
           parameters: ./parameters/uat.parameters.json appServiceAPIEnvVarENV=${{ vars.ENV }} appServiceAPIEnvVarDBHOST=${{ vars.DBHOST }} appServiceAPIEnvVarDBNAME=${{ vars.DBNAME }} appServiceAPIEnvVarDBPASS=${{ secrets.DBPASS }} appServiceAPIDBHostDBUSER=${{ secrets.DBUSER }} appServiceAPIDBHostFLASK_APP=${{ vars.FLASK_APP }} appServiceAPIDBHostFLASK_DEBUG=${{ vars.FLASK_DEBUG }}
