@@ -32,8 +32,7 @@ jobs:
         path: ./main.bicep
 
   deploy-dev:
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main' && github.event_name == 'push'  || github.event_name == 'workflow_dispatch'
     needs: build
     environment:
       name: 'Development'
